@@ -58,7 +58,7 @@ public class RestAPI {
         }
         ip+=":3700";
          */
-        String ip="http://172.30.1.28:3700";
+        String ip="http://192.168.1.253:3700";
         return ip;
     }
 }

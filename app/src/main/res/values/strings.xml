@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">BoxLinker</string>
+    <string name="default_notification_channel_name">default_channel</string>
+    <string name="default_notification_channel_id">80</string>
 </resources>

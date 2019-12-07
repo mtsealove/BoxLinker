@@ -2,6 +2,7 @@ package com.mtsealove.github.boxlinker.Design;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,5 +57,14 @@ public class SlideView extends LinearLayout {
     private void Login() {
         Intent intent = new Intent(context, LoginActivity.class);
         context.startActivity(intent);
+    }
+
+    public void CheckLogin() {
+        SharedPreferences pref = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
+        String phone = pref.getString("phone", "");
+        String name = pref.getString("name", "");
+        if(name.length()!=0) {
+
+        }
     }
 }

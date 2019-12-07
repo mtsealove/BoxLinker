@@ -45,14 +45,15 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     //자동 전화번호
+    @SuppressLint("MissingPermission")
     private void SetPhone() {
         TelephonyManager telManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-        @SuppressLint("MissingPermission") String PhoneNum = telManager.getLine1Number();
+        String PhoneNum = telManager.getLine1Number();
         if (PhoneNum.startsWith("+82")) {
             PhoneNum = PhoneNum.replace("+82", "0");
-            idEt.setText(PhoneNum);
-            idEt.setEnabled(false);
         }
+        idEt.setText(PhoneNum);
+        idEt.setEnabled(false);
     }
 
     //입력 체크

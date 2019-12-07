@@ -27,7 +27,7 @@
                   android:background="@drawable/back_et"
                   android:paddingVertical="5dp"
                   android:textSize="18sp"
-                  android:inputType="text"
+                  android:inputType="phone"
                   android:hint="Phone"
                   android:paddingHorizontal="10dp" />
 

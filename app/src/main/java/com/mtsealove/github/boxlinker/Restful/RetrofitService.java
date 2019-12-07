@@ -7,4 +7,7 @@ import retrofit2.http.POST;
 public interface RetrofitService {
     @POST("/SignUp")
     Call<Res> SignUp(@Body ReqSignUp reqSignUp);
+
+    @POST("Login")
+    Call<ResLogin> Login(@Body ReqLogin reqLogin);
 }
