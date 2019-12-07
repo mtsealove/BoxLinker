@@ -7,4 +7,7 @@
     <color name="black">#000000</color>
     <color name="divider_gray">#AFAFAF</color>
     <color name="menu_gray">#454545</color>
+    <color name="blue">#1C7CD5</color>
+    <color name="red">#FF0000</color>
+    <color name="account_gray">#F7F7F7</color>
 </resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:background="@color/white"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:padding="10dp"
+              android:orientation="vertical">
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+              android:text="결제 수단 설정"
+              android:textStyle="bold"
+              android:textSize="24sp"
+              android:textColor="@color/black"/>
+
+    <ListView android:layout_width="match_parent" android:layout_height="wrap_content"
+              android:id="@+id/payLv"
+              android:layout_marginVertical="10dp"
+              android:background="@drawable/back_et"
+              android:dividerHeight="1dp"
+              android:divider="@color/divider_gray"/>
+</LinearLayout>

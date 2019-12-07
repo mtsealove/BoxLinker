@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.*;
+import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -13,6 +14,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.mtsealove.github.boxlinker.Design.SystemUiTuner;
+import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapView;
 
@@ -115,7 +117,13 @@ public class SearchActivity extends AppCompatActivity {
         try {
             List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 10);
             if (addresses != null && addresses.size() != 0) {
-
+                String addrName=addresses.get(0).getAddressLine(1);
+                MapPOIItem marker = new MapPOIItem();
+                marker.setItemName(addrName);
+                marker.setTag(0);
+                marker.setMarkerType(MapPOIItem.MarkerType.BluePin);
+                marker.setMapPoint(MapPoint.mapPointWithCONGCoord(location.getLatitude(), location.getLongitude()));
+                mapView.addPOIItem(marker);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -129,7 +137,13 @@ public class SearchActivity extends AppCompatActivity {
         try {
             List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 10);
             if (addresses != null && addresses.size() != 0) {
-
+                MapPOIItem marker = new MapPOIItem();
+                String addrName=addresses.get(0).getAddressLine(1);
+                marker.setItemName(addrName);
+                marker.setTag(0);
+                marker.setMarkerType(MapPOIItem.MarkerType.BluePin);
+                marker.setMapPoint(MapPoint.mapPointWithCONGCoord(latitude, longitude));
+                mapView.addPOIItem(marker);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -158,26 +172,34 @@ public class SearchActivity extends AppCompatActivity {
                 resultLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                        //시점 이동
                         SetPoint(latitudes.get(position), longitudes.get(position));
-                        AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
-                        builder.setTitle("주소 선택")
-                                .setMessage(name.get(position) + " 을(를) 선택하시겠습니까?")
-                                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                        //1초 후 다이얼로그 출력
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
+                                builder.setTitle("주소 선택")
+                                        .setMessage(name.get(position) + " 을(를) 선택하시겠습니까?")
+                                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                            }
+                                        }).setPositiveButton("확인", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-
+                                        Intent intent = new Intent();
+                                        intent.putExtra("address", name.get(position));
+                                        setResult(RESULT_OK, intent);
+                                        finish();
                                     }
-                                }).setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent();
-                                intent.putExtra("address", name.get(position));
-                                setResult(RESULT_OK, intent);
-                                finish();
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
                             }
-                        });
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
+                        }, 1000);
                     }
                 });
             } else {

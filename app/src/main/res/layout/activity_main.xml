@@ -11,7 +11,8 @@
         <com.mtsealove.github.boxlinker.Design.TitleView android:layout_width="match_parent"
                                                          android:layout_height="wrap_content"/>
 
-        <ScrollView android:layout_width="match_parent" android:layout_height="wrap_content">
+        <ScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:scrollbars="none">
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                           android:orientation="vertical">
                 <!--배송 경로 설정-->
@@ -166,10 +167,31 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
+                <ImageView android:layout_width="match_parent" android:layout_height="200dp"
+                           android:background="@drawable/back_et"
+                           android:layout_marginHorizontal="15dp"
+                           android:layout_marginVertical="10dp"
+                           android:paddingHorizontal="10dp"
+                           android:paddingVertical="10dp"
+                           android:visibility="gone"
+                           android:id="@+id/imgIV"/>
+
                 <com.mtsealove.github.boxlinker.Design.GoView
                         android:id="@+id/MessageView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
+
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                          android:background="@drawable/back_et"
+                          android:text="메세지"
+                          android:textSize="17sp"
+                          android:textColor="@color/black"
+                          android:padding="10dp"
+                          android:visibility="gone"
+                          android:layout_marginHorizontal="15dp"
+                          android:layout_marginTop="10dp"
+                          android:id="@+id/msgTv"
+                />
 
                 <com.mtsealove.github.boxlinker.Design.GoView
                         android:id="@+id/PayView"
@@ -178,16 +200,18 @@
 
                 <Button android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:id="@+id/payBtn"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginVertical="10dp"
                         android:layout_marginHorizontal="15dp"
                         android:background="@drawable/btn_primary"
                         android:textColor="@color/white"
                         android:text="결제하기"
-                        android:textSize="18sp" />
+                        android:textSize="18sp"/>
             </LinearLayout>
         </ScrollView>
-
-
     </LinearLayout>
+
+    <com.mtsealove.github.boxlinker.Design.SlideView
+            android:layout_width="300dp" android:layout_height="match_parent"
+            android:layout_gravity="start" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

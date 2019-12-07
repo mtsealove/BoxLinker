@@ -2,4 +2,5 @@
 <resources>
     <declare-styleable name="TitleView"></declare-styleable>
     <declare-styleable name="GoView" />
+    <declare-styleable name="SlideView" />
 </resources>

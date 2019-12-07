@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="300dp"
+              android:layout_height="match_parent"
+              android:background="@color/white"
+              android:gravity="center_horizontal"
+              android:orientation="vertical">
+
+    <!--로고-->
+    <ImageView android:layout_width="60dp" android:layout_height="60dp"
+               android:layout_marginTop="40dp"
+               android:src="@drawable/app_icon"/>
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+              android:layout_marginTop="20dp"
+              android:textColor="@color/black"
+              android:textSize="30sp"
+              android:textStyle="bold"
+              android:text="@string/app_name"/>
+
+    <!--content-->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                  android:orientation="vertical"
+                  android:layout_marginTop="20dp"
+                  android:layout_marginHorizontal="15dp"
+                  android:background="@drawable/back_et">
+
+        <!--로그인 되었을 경우 출력할 레이아웃-->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:id="@+id/loginLayout"
+                      android:orientation="vertical">
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                      android:layout_marginHorizontal="15dp"
+                      android:layout_marginTop="10dp"
+                      android:orientation="horizontal">
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                      android:textColor="@color/blue"
+                      android:text="이름"
+                      android:id="@+id/nameTv"
+                      android:textStyle="bold"
+                      android:textSize="18sp"/>
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                      android:textColor="@color/black"
+                      android:layout_marginLeft="5dp"
+                      android:text="님"
+                      android:textStyle="bold"
+                      android:textSize="18sp"/>
+        </LinearLayout>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                  android:layout_marginHorizontal="15dp"
+                  android:layout_marginTop="10dp"
+                  android:text="내용"
+                  android:id="@+id/contentTv"
+                  android:textColor="@color/black"
+                  android:textSize="18sp"/>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                  android:layout_marginHorizontal="15dp"
+                  android:layout_marginVertical="10dp"
+                  android:layout_gravity="right"
+                  android:text="로그아웃"
+                  android:textColor="@color/red"
+                  android:textSize="18sp"/>
+        </LinearLayout>
+
+        <!--비 로그인 레이아웃-->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                  android:id="@+id/loginTv"
+                  android:layout_marginHorizontal="15dp"
+                  android:layout_marginVertical="10dp"
+                  android:textSize="18sp"
+                  android:textColor="@color/black"
+                  android:text="로그인" />
+
+        <ImageView android:layout_width="match_parent" android:layout_height="1.5dp"
+                   android:src="@drawable/dash_line"
+                   android:layerType="software"/>
+
+        <!--내역 조회-->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                  android:id="@+id/inquireTv"
+                  android:layout_marginHorizontal="15dp"
+                  android:layout_marginVertical="10dp"
+                  android:textSize="18sp"
+                  android:textColor="@color/black"
+                  android:text="배송 내역 조회" />
+    </LinearLayout>
+</LinearLayout>
