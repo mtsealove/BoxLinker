@@ -50,15 +50,11 @@ public class RestAPI {
     }
 
     private String GetIP() {
-        /*
         SharedPreferences pref = context.getSharedPreferences("pref", MODE_PRIVATE);
-        String ip = "http://" + pref.getString("ip", "");
+        String ip = pref.getString("ip", "");
         if (ip == null || ip.length() == 0) {
             ip = "172.30.1.28";
         }
-        ip+=":3700";
-         */
-        String ip="http://192.168.1.253:3700";
         return ip;
     }
 }

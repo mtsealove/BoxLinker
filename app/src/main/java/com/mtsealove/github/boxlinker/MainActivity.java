@@ -23,21 +23,27 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.loader.content.CursorLoader;
 import com.mtsealove.github.boxlinker.Design.GoView;
+import com.mtsealove.github.boxlinker.Design.SlideView;
 import com.mtsealove.github.boxlinker.Design.SystemUiTuner;
+import com.mtsealove.github.boxlinker.Restful.ReqOrder;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    public static final int Start = 100, End = 200, ImageFile = 300;
+    public static final int Start = 100, End = 200, ImageFile = 300, Order = 400;
     GoView KindView, PhotoView, MessageView, PayView;
     TextView stTv, dstTv, msgTv;
     EditText name1Et, contact1Et, name2Et, contact2Et;
     ImageView imgIv;
     Button payBtn;
+    SlideView slideView;
+    public static DrawerLayout drawerLayout;
 
     //위치
     Geocoder geocoder;
@@ -45,7 +51,9 @@ public class MainActivity extends AppCompatActivity {
 
     //폼 데이터
     String stAddr = null, dstAddr = null, msg = null, imagePath = null;
+    String stName = null, stPhone = null, dstName = null, dstPhone = null, payMethod = null;
     int size = 0, weight = 0;
+    Uri imgUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        slideView = findViewById(R.id.slideView);
+        drawerLayout = findViewById(R.id.drawerLayout);
         msgTv = findViewById(R.id.msgTv);
         stTv = findViewById(R.id.stTv);
         dstTv = findViewById(R.id.dstTv);
@@ -112,6 +122,13 @@ public class MainActivity extends AppCompatActivity {
         SetLocation();
         initGoViews();
         SetContactEt();
+
+        payBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CheckInput();
+            }
+        });
     }
 
     //클릭 뷰 설정
@@ -168,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
         contact1Et.setEnabled(false);
     }
 
+    //현재 위치 찾기
     @SuppressLint("MissingPermission")
     private void SetLocation() {
         geocoder = new Geocoder(this);
@@ -179,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
             GeoCode(location);
     }
 
+    //현재 위치 찾기 리스너
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
@@ -220,28 +239,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SearchActivity.class);
         intent.putExtra("requestCode", requestCode);
         startActivityForResult(intent, requestCode);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case Start:
-                    stAddr = data.getStringExtra("address");
-                    stTv.setText(stAddr);
-                    break;
-                case End:
-                    dstAddr = data.getStringExtra("address");
-                    dstTv.setText(dstAddr);
-                    break;
-                case ImageFile:
-                    Uri selectImage = data.getData();
-                    imagePath = getRealPathFromURI(selectImage);
-                    Log.e("imagePath", imagePath);
-                    break;
-            }
-        }
     }
 
     //크기 입력 다이얼로그 출력
@@ -337,6 +334,7 @@ public class MainActivity extends AppCompatActivity {
                         pay = "가상 계좌";
                         break;
                 }
+                payMethod = pay;
                 PayView.SetCallback(pay);
             }
         });
@@ -372,9 +370,99 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
         return result;
     }
 
+    //네비바 열기
+    public static void OpenDrawer() {
+        if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.openDrawer(GravityCompat.START);
+        }
+    }
 
+    //네비바 닫기
+    public static void CloseDrawer() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
+    }
+
+    private void CheckInput() {
+        stName = name1Et.getText().toString();
+        stPhone = contact1Et.getText().toString();
+        dstName = name2Et.getText().toString();
+        dstPhone = contact2Et.getText().toString();
+        if (stAddr == null || stAddr.length() == 0) {
+            Toast.makeText(this, "출발지를 선택하세요", Toast.LENGTH_SHORT).show();
+        } else if (stName.length() == 0) {
+            Toast.makeText(this, "보내는 사람 이름을 입력하세요", Toast.LENGTH_SHORT).show();
+        } else if (stPhone.length() == 0) {
+            Toast.makeText(this, "보내는 사람 연락처를 입력하세요", Toast.LENGTH_SHORT).show();
+        } else if (dstAddr == null || dstAddr.length() == 0) {
+            Toast.makeText(this, "도착지를 선택하세요", Toast.LENGTH_SHORT).show();
+        } else if (dstName.length() == 0) {
+            Toast.makeText(this, "받는 사람 이름을 입력하세요", Toast.LENGTH_SHORT).show();
+        } else if (dstPhone.length() == 0) {
+            Toast.makeText(this, "받는 사람 연락처를 입력하세요", Toast.LENGTH_SHORT).show();
+        } else if (size <= 0) {
+            Toast.makeText(this, "화물 크기를 입력하세요", Toast.LENGTH_SHORT).show();
+        } else if (weight <= 0) {
+            Toast.makeText(this, "무게를 입력하세요", Toast.LENGTH_SHORT).show();
+        } else if (imgUri == null) {
+            Toast.makeText(this, "상품 사진을 선택하세요", Toast.LENGTH_SHORT).show();
+        } else if (payMethod == null) {
+            Toast.makeText(this, "결제 방법을 선택하세요", Toast.LENGTH_SHORT).show();
+        } else { //모든 데이터 입력 완료
+            ReqOrder order = new ReqOrder(stPhone, stPhone, stName, stAddr, dstPhone, dstName, dstAddr, payMethod, size, weight, msg);
+            Intent intent = new Intent(this, OrderActivity.class);
+            intent.putExtra("order", order);
+            intent.putExtra("uri", imgUri);
+            startActivityForResult(intent, Order);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //로그인 확인
+        slideView.CheckLogin();
+    }
+
+    @Override
+    public void onBackPressed() {
+        //네비바 닫기
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case Start:
+                    stAddr = data.getStringExtra("address");
+                    stTv.setText(stAddr);
+                    break;
+                case End:
+                    dstAddr = data.getStringExtra("address");
+                    dstTv.setText(dstAddr);
+                    break;
+                case ImageFile:
+                    Uri selectImage = data.getData();
+                    imgUri = selectImage;
+                    imagePath = getRealPathFromURI(selectImage);
+                    Log.e("imagePath", imagePath);
+                    break;
+                case Order:
+                    Intent intent = new Intent(this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                    break;
+            }
+        }
+    }
 }

@@ -18,6 +18,14 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true">
+        <activity android:name=".OrderInquireActivity">
+        </activity>
+        <activity android:name=".OrderListActivity">
+        </activity>
+        <activity android:name=".OrderActivity">
+        </activity>
+        <activity android:name=".SetIpActivity">
+        </activity>
         <activity android:name=".SignUpActivity">
         </activity>
         <activity android:name=".LoginActivity">
@@ -38,11 +46,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <service android:name=".Service.FCM">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
+
         <uses-library
                 android:name="org.apache.http.legacy"
                 android:required="false"/>

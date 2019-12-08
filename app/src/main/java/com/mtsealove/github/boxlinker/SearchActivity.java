@@ -142,7 +142,8 @@ public class SearchActivity extends AppCompatActivity {
                 marker.setItemName(addrName);
                 marker.setTag(0);
                 marker.setMarkerType(MapPOIItem.MarkerType.BluePin);
-                marker.setMapPoint(MapPoint.mapPointWithCONGCoord(latitude, longitude));
+                marker.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
+                marker.setMapPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude));
                 mapView.addPOIItem(marker);
             }
         } catch (IOException e) {
