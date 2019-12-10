@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import com.mtsealove.github.boxlinker.Design.SlideView;
 import com.mtsealove.github.boxlinker.Design.SystemUiTuner;
 import com.mtsealove.github.boxlinker.Restful.ResOrder;
 import com.mtsealove.github.boxlinker.Restful.RestAPI;
@@ -32,6 +33,7 @@ public class OrderInquireActivity extends AppCompatActivity {
     TextView currentLocationTv, statusTv, stTv, dstTv, itemTv, orderIdTv;
     RelativeLayout container;
     static DrawerLayout drawerLayout;
+    SlideView slideView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,7 @@ public class OrderInquireActivity extends AppCompatActivity {
         itemTv = findViewById(R.id.itemTv);
         container = findViewById(R.id.mapContainer);
         drawerLayout = findViewById(R.id.drawerLayout);
+        slideView = findViewById(R.id.slideView);
 
         SystemUiTuner tuner = new SystemUiTuner(this);
         tuner.setStatusBarWhite();
@@ -108,6 +111,21 @@ public class OrderInquireActivity extends AppCompatActivity {
     public static void OpenDrawer() {
         if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.openDrawer(GravityCompat.START);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        slideView.CheckLogin();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
         }
     }
 }

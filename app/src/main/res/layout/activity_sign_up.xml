@@ -48,7 +48,7 @@
                   android:paddingVertical="5dp"
                   android:textSize="18sp"
                   android:inputType="textPassword"
-                  android:hint="Password"
+                  android:hint="비밀번호"
                   android:paddingHorizontal="10dp" />
 
         <EditText android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
                   android:paddingVertical="5dp"
                   android:textSize="18sp"
                   android:inputType="textPassword"
-                  android:hint="Password"
+                  android:hint="비밀번호 확인"
                   android:paddingHorizontal="10dp" />
 
         <Button android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
                 android:background="@drawable/btn_primary"
                 android:textSize="18sp"
                 android:textColor="@color/white"
-                android:text="로그인"  />
+                android:text="회원가입"  />
     </LinearLayout>
 
 </RelativeLayout>

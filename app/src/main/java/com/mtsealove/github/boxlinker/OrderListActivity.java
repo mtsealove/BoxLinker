@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import com.mtsealove.github.boxlinker.Design.OrderRecyclerAdapter;
+import com.mtsealove.github.boxlinker.Design.SlideView;
 import com.mtsealove.github.boxlinker.Design.SystemUiTuner;
 import com.mtsealove.github.boxlinker.Restful.ResOrderSm;
 import com.mtsealove.github.boxlinker.Restful.RestAPI;
@@ -27,6 +28,7 @@ public class OrderListActivity extends AppCompatActivity {
     RecyclerView orderRv;
     ProgressDialog progressDialog;
     static DrawerLayout drawerLayout;
+    SlideView slideView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,7 @@ public class OrderListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_order_list);
         orderRv = findViewById(R.id.orderRv);
         drawerLayout = findViewById(R.id.drawerLayout);
+        slideView = findViewById(R.id.slideView);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         orderRv.setLayoutManager(layoutManager);
@@ -90,8 +93,23 @@ public class OrderListActivity extends AppCompatActivity {
     }
 
     public static void OpenDrawer() {
-        if(!drawerLayout.isDrawerOpen(GravityCompat.START)) {
+        if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.openDrawer(GravityCompat.START);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        slideView.CheckLogin();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
         }
     }
 }

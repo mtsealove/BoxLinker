@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -21,6 +22,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SlideView extends LinearLayout {
+    String tag = getClass().getSimpleName();
     Context context;
     LinearLayout loginLayout;
     TextView loginTv, inquireTv, nameTv, contentTv, logoutTv;
@@ -96,15 +98,16 @@ public class SlideView extends LinearLayout {
             call.enqueue(new Callback<ResRecent>() {
                 @Override
                 public void onResponse(Call<ResRecent> call, Response<ResRecent> response) {
-                    if(response.isSuccessful()) {
-                        ResRecent resRecent=response.body();
-                        contentTv.setText("최근 사용 내역\n발송: "+resRecent.getSend()+" 수령: "+resRecent.getReceive());
+                    if (response.isSuccessful()) {
+                        ResRecent resRecent = response.body();
+                        contentTv.setText("최근 사용 내역\n발송: " + resRecent.getSend() + " 수령: " + resRecent.getReceive());
                     }
+                    Log.e(tag, response.toString());
                 }
 
                 @Override
                 public void onFailure(Call<ResRecent> call, Throwable t) {
-
+                    Log.e(tag, t.toString());
                 }
             });
             loginTv.setVisibility(GONE);

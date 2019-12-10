@@ -4,10 +4,10 @@ import java.io.Serializable;
 
 public class ReqOrder implements Serializable {
     String MemberID, StdPhone, StdName, StdAddr, DstPhone, DstName, DstAddr, PayMethod, Msg;
-    int Size;
+    int Size, Price;
     double Weight, Latitude, Longitude;
 
-    public ReqOrder(String memberID, String stdPhone, String stdName, String stdAddr, String dstPhone, String dstName, String dstAddr, String payMethod, int size, double weight, String msg) {
+    public ReqOrder(String memberID, String stdPhone, String stdName, String stdAddr, String dstPhone, String dstName, String dstAddr, String payMethod, int size, double weight, String msg, int price) {
         MemberID = memberID;
         StdPhone = stdPhone;
         StdName = stdName;
@@ -18,7 +18,8 @@ public class ReqOrder implements Serializable {
         PayMethod = payMethod;
         Size = size;
         Weight = weight;
-        this.Msg=msg;
+        this.Msg = msg;
+        this.Price = price;
     }
 
     public String getMemberID() {
@@ -123,5 +124,13 @@ public class ReqOrder implements Serializable {
 
     public void setMsg(String msg) {
         Msg = msg;
+    }
+
+    public int getPrice() {
+        return Price;
+    }
+
+    public void setPrice(int price) {
+        Price = price;
     }
 }

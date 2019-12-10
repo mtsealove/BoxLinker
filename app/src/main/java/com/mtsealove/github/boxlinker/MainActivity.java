@@ -38,7 +38,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     public static final int Start = 100, End = 200, ImageFile = 300, Order = 400;
     GoView KindView, PhotoView, MessageView, PayView;
-    TextView stTv, dstTv, msgTv;
+    TextView stTv, dstTv, msgTv, priceTv;
     EditText name1Et, contact1Et, name2Et, contact2Et;
     ImageView imgIv;
     Button payBtn;
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     //폼 데이터
     String stAddr = null, dstAddr = null, msg = null, imagePath = null;
     String stName = null, stPhone = null, dstName = null, dstPhone = null, payMethod = null;
-    int size = 0, weight = 0;
+    int size = 0, weight = 0, price = 0;
     Uri imgUri;
 
     @Override
@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         MessageView = findViewById(R.id.MessageView);
         PayView = findViewById(R.id.PayView);
         imgIv = findViewById(R.id.imgIV);
+        priceTv = findViewById(R.id.priceTv);
 
         imgIv.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         slideView = findViewById(R.id.slideView);
+        slideView.CheckLogin();
         drawerLayout = findViewById(R.id.drawerLayout);
         msgTv = findViewById(R.id.msgTv);
         stTv = findViewById(R.id.stTv);
@@ -243,6 +245,13 @@ public class MainActivity extends AppCompatActivity {
 
     //크기 입력 다이얼로그 출력
     private void ShowSizeDialog() {
+        if (stAddr == null) {
+            Toast.makeText(this, "출발지를 먼저 선택하세요", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (dstAddr == null) {
+            Toast.makeText(this, "도착지를 먼저 선택하세요", Toast.LENGTH_SHORT).show();
+            return;
+        }
         //뷰 inflate
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.dialog_item_size, null, false);
@@ -262,11 +271,32 @@ public class MainActivity extends AppCompatActivity {
                     size = Integer.parseInt(sizeEt.getText().toString());
                     weight = Integer.parseInt(weightEt.getText().toString());
                     KindView.SetCallback("크기: " + size + "cm 무게: " + weight + "Kg");
+                    SetPrice();
                     dialog.dismiss();
                 }
             }
         });
         dialog.show();
+    }
+
+    private void SetPrice() {
+        double lat1, lon1, lat2, lon2;
+        geocoder = new Geocoder(this);
+        try {
+            List<Address> addressList = geocoder.getFromLocationName(stAddr, 2);
+            lat1 = addressList.get(0).getLatitude();
+            lon1 = addressList.get(0).getLongitude();
+            addressList = geocoder.getFromLocationName(dstAddr, 2);
+            lat2 = addressList.get(0).getLatitude();
+            lon2 = addressList.get(0).getLongitude();
+
+            double distance = DistanceManager.distance(lat1, lon1, lat2, lon2);
+            price = (((int) (distance + size + weight) / 12) / 100) * 100;
+            priceTv.setText("결제 금액: " + price + "원");
+            priceTv.setVisibility(View.VISIBLE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     //메시지 입력 다이얼로그 출력
@@ -413,7 +443,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (payMethod == null) {
             Toast.makeText(this, "결제 방법을 선택하세요", Toast.LENGTH_SHORT).show();
         } else { //모든 데이터 입력 완료
-            ReqOrder order = new ReqOrder(stPhone, stPhone, stName, stAddr, dstPhone, dstName, dstAddr, payMethod, size, weight, msg);
+            ReqOrder order = new ReqOrder(stPhone, stPhone, stName, stAddr, dstPhone, dstName, dstAddr, payMethod, size, weight, msg, price);
             Intent intent = new Intent(this, OrderActivity.class);
             intent.putExtra("order", order);
             intent.putExtra("uri", imgUri);
