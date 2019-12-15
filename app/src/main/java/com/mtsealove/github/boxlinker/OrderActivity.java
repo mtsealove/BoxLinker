@@ -9,14 +9,14 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.loader.content.CursorLoader;
-import com.mtsealove.github.boxlinker.Design.GoView;
+import com.google.gson.JsonObject;
 import com.mtsealove.github.boxlinker.Design.SystemUiTuner;
-import com.mtsealove.github.boxlinker.Restful.ReqOrder;
-import com.mtsealove.github.boxlinker.Restful.Res;
-import com.mtsealove.github.boxlinker.Restful.RestAPI;
+import com.mtsealove.github.boxlinker.Restful.*;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -26,18 +26,20 @@ import retrofit2.Response;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-public class OrderActivity extends AppCompatActivity {
+public class OrderActivity extends AppCompatActivity{
     Intent intent;
     ReqOrder order;
     Uri imageUri;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
-        SystemUiTuner tuner=new SystemUiTuner(this);
+        SystemUiTuner tuner = new SystemUiTuner(this);
         tuner.setStatusBarWhite();
 
         intent = getIntent();
@@ -71,8 +73,8 @@ public class OrderActivity extends AppCompatActivity {
         call.enqueue(new Callback<Res>() {
             @Override
             public void onResponse(Call<Res> call, Response<Res> response) {
-                if(response.isSuccessful()) {
-                    if(response.body().isResult()) {    //주문 성공
+                if (response.isSuccessful()) {
+                    if (response.body().isResult()) {    //주문 성공
                         Toast.makeText(OrderActivity.this, "주문이 신청되었습니다", Toast.LENGTH_SHORT).show();
                         setResult(RESULT_OK);
                         finish();
@@ -107,5 +109,34 @@ public class OrderActivity extends AppCompatActivity {
         File file = new File(getRealPathFromURI(fileUri));
         RequestBody requestFile = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);
         return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
+    }
+
+    private void GetToss(int amount) {
+        TossAPI tossAPI = new TossAPI(this);
+        JsonObject object = new JsonObject();
+        object.addProperty("apiKey", "0e40ad7c7ddb4693bc186a63942cd924");
+        object.addProperty("bankName", "국민");
+        object.addProperty("bankAccountNo", "05100204189909");
+        object.addProperty("amount", amount);
+        object.addProperty("message", "토스입금");
+        Call<ResToss> call = tossAPI.getRetrofitService().getToss(object);
+        call.enqueue(new Callback<ResToss>() {
+            @Override
+            public void onResponse(Call<ResToss> call, Response<ResToss> response) {
+                if (response.isSuccessful()) {
+                    Log.e("toss", response.body().toString());
+                    String url = response.body().getSuccess().getLink();
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(intent);
+                } else {
+                    Log.e("toss", response.toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResToss> call, Throwable t) {
+                Log.e("toss", t.toString());
+            }
+        });
     }
 }

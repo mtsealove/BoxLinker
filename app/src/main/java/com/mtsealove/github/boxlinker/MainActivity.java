@@ -1,14 +1,17 @@
 package com.mtsealove.github.boxlinker;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.icu.text.UnicodeSetSpanner;
 import android.location.*;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.Vibrator;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.telephony.TelephonyManager;
@@ -19,29 +22,43 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.*;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.loader.content.CursorLoader;
+import com.anjlab.android.iab.v3.BillingProcessor;
+import com.anjlab.android.iab.v3.Constants;
+import com.anjlab.android.iab.v3.TransactionDetails;
+import com.google.gson.JsonObject;
 import com.mtsealove.github.boxlinker.Design.GoView;
 import com.mtsealove.github.boxlinker.Design.SlideView;
 import com.mtsealove.github.boxlinker.Design.SystemUiTuner;
 import com.mtsealove.github.boxlinker.Restful.ReqOrder;
+import com.mtsealove.github.boxlinker.Restful.ResToss;
+import com.mtsealove.github.boxlinker.Restful.Success;
+import com.mtsealove.github.boxlinker.Restful.TossAPI;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
-    public static final int Start = 100, End = 200, ImageFile = 300, Order = 400;
-    GoView KindView, PhotoView, MessageView, PayView;
+public class MainActivity extends AppCompatActivity implements BillingProcessor.IBillingHandler {
+    public static final int Start = 100, End = 200, ImageFile = 300, Order = 400, Contact = 500, CAMERA = 600;
+    GoView KindView, PhotoView, MessageView;
     TextView stTv, dstTv, msgTv, priceTv;
     EditText name1Et, contact1Et, name2Et, contact2Et;
     ImageView imgIv;
-    Button payBtn;
+    Button payBtn, getContactBtn;
     SlideView slideView;
     public static DrawerLayout drawerLayout;
 
@@ -51,9 +68,12 @@ public class MainActivity extends AppCompatActivity {
 
     //폼 데이터
     String stAddr = null, dstAddr = null, msg = null, imagePath = null;
-    String stName = null, stPhone = null, dstName = null, dstPhone = null, payMethod = null;
+    String stName = null, stPhone = null, dstName = null, dstPhone = null;
     int size = 0, weight = 0, price = 0;
     Uri imgUri;
+
+    //결제
+    private BillingProcessor bp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,9 +86,9 @@ public class MainActivity extends AppCompatActivity {
         KindView = findViewById(R.id.KindView);
         PhotoView = findViewById(R.id.PhotoView);
         MessageView = findViewById(R.id.MessageView);
-        PayView = findViewById(R.id.PayView);
         imgIv = findViewById(R.id.imgIV);
         priceTv = findViewById(R.id.priceTv);
+        getContactBtn = findViewById(R.id.getContactBtn);
 
         imgIv.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -124,6 +144,8 @@ public class MainActivity extends AppCompatActivity {
         SetLocation();
         initGoViews();
         SetContactEt();
+        SetNameEt();
+        getMsg();
 
         payBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,6 +153,15 @@ public class MainActivity extends AppCompatActivity {
                 CheckInput();
             }
         });
+        getContactBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GetContact();
+            }
+        });
+        bp = new BillingProcessor(this, getString(R.string.pay_key), this);
+        bp.initialize();
+
     }
 
     //클릭 뷰 설정
@@ -159,14 +190,13 @@ public class MainActivity extends AppCompatActivity {
                 ShowMsgDialog();
             }
         });
-        PayView.SetTitle("결제 방법 선택");
-        PayView.SetCallback("");
-        PayView.getRootLayout().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ShowPayDialog();
-            }
-        });
+    }
+
+    //이름 설정
+    private void SetNameEt() {
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        String name = pref.getString("name", "");
+        name1Et.setText(name);
     }
 
     //전화번호 입력 설정
@@ -291,11 +321,23 @@ public class MainActivity extends AppCompatActivity {
             lon2 = addressList.get(0).getLongitude();
 
             double distance = DistanceManager.distance(lat1, lon1, lat2, lon2);
-            price = (((int) (distance + size + weight) / 12) / 100) * 100;
+            price = (((int) (distance + 1000 * (size + weight)) / 15) / 100) * 100;
+            //쵀대 최소 금액
+            if (price < 5000) price = 5000;
+            else if (price > 100000) price = 100000;
             priceTv.setText("결제 금액: " + price + "원");
             priceTv.setVisibility(View.VISIBLE);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void getMsg() {
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        msg = pref.getString("msg", "");
+        if (msg.length() != 0) {
+            msgTv.setVisibility(View.VISIBLE);
+            msgTv.setText(msg);
         }
     }
 
@@ -308,6 +350,7 @@ public class MainActivity extends AppCompatActivity {
             msgEt.setText(msg);
         }
         Button confirmBtn = view.findViewById(R.id.confirmMsgBtn);
+        final CheckBox keepCb = view.findViewById(R.id.msgCb);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(view);
         final AlertDialog dialog = builder.create();
@@ -317,6 +360,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 msg = msgEt.getText().toString();
+                SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
+                //메시지 저장
+                if (keepCb.isChecked()) {
+                    editor.putString("msg", msg);
+                    editor.commit();
+                } else {
+                    editor.remove("msg");
+                    editor.commit();
+                }
                 dialog.dismiss();
                 //데이터가 입력되면 화면에 표시
                 if (msg != null && msg.length() != 0) {
@@ -332,53 +385,37 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    //결제 방법 다이얼로그 출력
-    private void ShowPayDialog() {
+    //이미지 얻기
+    private void ChooseImage() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.dialog_pay_method, null, false);
-        ListView methodLv = view.findViewById(R.id.payLv);
-        ArrayList<String> method = new ArrayList<>();
-
-        builder.setView(view);
-        method.add("카드 결제");
-        method.add("무통장 입금");
-        method.add("가상 계좌");
-
-        final AlertDialog dialog = builder.create();
-        ArrayAdapter arrayAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, method);
-        methodLv.setAdapter(arrayAdapter);
-        methodLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        builder.setTitle("사진 업로드")
+                .setNeutralButton("사진 촬영", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ImageFromCamera();
+                    }
+                }).setPositiveButton("앨범에서 선택", new DialogInterface.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                dialog.dismiss();
-                String pay = "";
-                switch (position) {
-                    case 0:
-                        pay = "카드 결제";
-                        break;
-                    case 1:
-                        pay = "무통장 입금";
-                        break;
-                    case 2:
-                        pay = "가상 계좌";
-                        break;
-                }
-                payMethod = pay;
-                PayView.SetCallback(pay);
+            public void onClick(DialogInterface dialog, int which) {
+                ImageFromAlbum();
             }
         });
+        AlertDialog dialog = builder.create();
         dialog.show();
     }
 
-    //이미지 얻기
-    private void ChooseImage() {
+    private void ImageFromAlbum() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType(android.provider.MediaStore.Images.Media.CONTENT_TYPE);
         intent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         Intent chooser = Intent.createChooser(intent, "상품 파일 선택");
 
         startActivityForResult(chooser, ImageFile);
+    }
+
+    private void ImageFromCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, CAMERA);
     }
 
     //이미지 경로 불러오기
@@ -417,6 +454,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //연락처 선택
+    private void GetContact() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setData(ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+        startActivityForResult(intent, Contact);
+    }
+
     private void CheckInput() {
         stName = name1Et.getText().toString();
         stPhone = contact1Et.getText().toString();
@@ -440,14 +484,14 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "무게를 입력하세요", Toast.LENGTH_SHORT).show();
         } else if (imgUri == null) {
             Toast.makeText(this, "상품 사진을 선택하세요", Toast.LENGTH_SHORT).show();
-        } else if (payMethod == null) {
-            Toast.makeText(this, "결제 방법을 선택하세요", Toast.LENGTH_SHORT).show();
         } else { //모든 데이터 입력 완료
-            ReqOrder order = new ReqOrder(stPhone, stPhone, stName, stAddr, dstPhone, dstName, dstAddr, payMethod, size, weight, msg, price);
+            ReqOrder order = new ReqOrder(stPhone, stPhone, stName, stAddr, dstPhone, dstName, dstAddr, size, weight, msg, price);
             Intent intent = new Intent(this, OrderActivity.class);
             intent.putExtra("order", order);
             intent.putExtra("uri", imgUri);
-            startActivityForResult(intent, Order);
+            //startActivityForResult(intent, Order);
+            String pid = "price" + price;
+            bp.purchase(this, pid);
         }
     }
 
@@ -470,16 +514,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        if (!bp.handleActivityResult(requestCode, resultCode, data))
+            super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case Start:
                     stAddr = data.getStringExtra("address");
                     stTv.setText(stAddr);
+                    if (price != 0) SetPrice();
                     break;
                 case End:
                     dstAddr = data.getStringExtra("address");
                     dstTv.setText(dstAddr);
+                    if (price != 0) SetPrice();
                     break;
                 case ImageFile:
                     Uri selectImage = data.getData();
@@ -487,12 +534,77 @@ public class MainActivity extends AppCompatActivity {
                     imagePath = getRealPathFromURI(selectImage);
                     Log.e("imagePath", imagePath);
                     break;
+                case CAMERA:
+                    Bundle extras = data.getExtras();
+                    Bitmap imageBitmap = (Bitmap) extras.get("data");
+                    imgUri = getImageUri(this, imageBitmap);
+                    imagePath = getRealPathFromURI(imgUri);
+                    break;
                 case Order:
                     Intent intent = new Intent(this, MainActivity.class);
                     startActivity(intent);
                     finish();
                     break;
+                case Contact:
+                    SetContact(data);
+                    break;
             }
         }
     }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+
+    private void SetContact(Intent data) {
+        Cursor cursor = getContentResolver().query(data.getData(),
+                new String[]{ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                        ContactsContract.CommonDataKinds.Phone.NUMBER}, null, null, null);
+        cursor.moveToFirst();
+        String name = cursor.getString(0);        //0은 이름을 얻어옵니다.
+        String number = cursor.getString(1);   //1은 번호를 받아옵니다.
+        cursor.close();
+        name2Et.setText(name);
+        contact2Et.setText(number);
+    }
+
+    @Override
+    public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails details) {
+        Toast.makeText(this, "결제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
+        ReqOrder order = new ReqOrder(stPhone, stPhone, stName, stAddr, dstPhone, dstName, dstAddr, size, weight, msg, price);
+        Intent intent = new Intent(this, OrderActivity.class);
+        intent.putExtra("order", order);
+        intent.putExtra("uri", imgUri);
+        startActivityForResult(intent, Order);
+    }
+
+    @Override
+    public void onPurchaseHistoryRestored() {
+
+    }
+
+    @Override
+    public void onBillingError(int errorCode, @Nullable Throwable error) {
+        if (errorCode != Constants.BILLING_RESPONSE_RESULT_USER_CANCELED) {
+            Toast.makeText(this, "오류가 발생하였습니다", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onBillingInitialized() {
+
+    }
+
+    @Override
+    public void onDestroy() {
+        if (bp != null) {
+            bp.release();
+        }
+        super.onDestroy();
+    }
+
 }

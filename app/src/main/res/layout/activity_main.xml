@@ -142,6 +142,16 @@
                               android:paddingVertical="5dp"
                               android:paddingLeft="10dp"/>
 
+                    <Button android:layout_width="wrap_content" android:layout_height="40dp"
+                            android:id="@+id/getContactBtn"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginTop="10dp"
+                            android:layout_below="@id/contact2Et"
+                            android:background="@drawable/btn_blue"
+                            android:text="연락처"
+                            android:textColor="@color/white"
+                            android:textSize="18sp"/>
+
                 </RelativeLayout>
 
                 <View android:layout_width="match_parent" android:layout_height="1dp"
@@ -194,11 +204,6 @@
                           android:layout_marginTop="10dp"
                           android:id="@+id/msgTv"
                 />
-
-                <com.mtsealove.github.boxlinker.Design.GoView
-                        android:id="@+id/PayView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
 
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                           android:layout_marginHorizontal="15dp"

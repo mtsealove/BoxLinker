@@ -2,4 +2,5 @@
     <string name="app_name">BoxLinker</string>
     <string name="default_notification_channel_name">default_channel</string>
     <string name="default_notification_channel_id">80</string>
+    <string name="pay_key">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkm+UIc3Y944M3EIJu818dKQZ0tFxGTNX60X9eZRhvsfB7m68O8WCKZlSeM0KFpSh4wFWNKloGQVmI8ZmoK9mRahEc3BCfmlwAzPjQo24mLciUWoS1Fdgt/Ft/wltMgsenjo9R5E0lLkwWcc8XEGpWhbAoEXeGn1h25TK8ONhw6dad+odFunl07fTNmQ6pdbwj2pTRpfTlTxvgSORr6i/TJBiQMmtZcASoAw6WjAtzr5Qtm5ZjTNWaT4ABKh1FJtCmcw/m9ezmtdtwHNCOmCU7aBl3ZgCaXobPXUPjnNsjMY9R+OUKO81Nb5P7ag4LbqJOQfhd//heZSMCC8ijd76HwIDAQAB</string>
 </resources>

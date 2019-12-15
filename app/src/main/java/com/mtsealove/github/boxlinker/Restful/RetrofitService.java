@@ -1,6 +1,8 @@
 package com.mtsealove.github.boxlinker.Restful;
 
+import com.google.gson.JsonObject;
 import okhttp3.MultipartBody;
+import org.json.JSONObject;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -25,4 +27,7 @@ public interface RetrofitService {
 
     @GET("/Recent")
     Call<ResRecent> GetRecent(@Query("phone") String phone);
+
+    @POST("/transfer-web/linkgen-api/link")
+    Call<ResToss> getToss(@Body JsonObject jsonObject);
 }

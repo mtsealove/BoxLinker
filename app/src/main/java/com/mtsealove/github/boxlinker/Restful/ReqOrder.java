@@ -3,11 +3,11 @@ package com.mtsealove.github.boxlinker.Restful;
 import java.io.Serializable;
 
 public class ReqOrder implements Serializable {
-    String MemberID, StdPhone, StdName, StdAddr, DstPhone, DstName, DstAddr, PayMethod, Msg;
+    String MemberID, StdPhone, StdName, StdAddr, DstPhone, DstName, DstAddr, Msg;
     int Size, Price;
     double Weight, Latitude, Longitude;
 
-    public ReqOrder(String memberID, String stdPhone, String stdName, String stdAddr, String dstPhone, String dstName, String dstAddr, String payMethod, int size, double weight, String msg, int price) {
+    public ReqOrder(String memberID, String stdPhone, String stdName, String stdAddr, String dstPhone, String dstName, String dstAddr, int size, double weight, String msg, int price) {
         MemberID = memberID;
         StdPhone = stdPhone;
         StdName = stdName;
@@ -15,7 +15,6 @@ public class ReqOrder implements Serializable {
         DstPhone = dstPhone;
         DstName = dstName;
         DstAddr = dstAddr;
-        PayMethod = payMethod;
         Size = size;
         Weight = weight;
         this.Msg = msg;
@@ -76,14 +75,6 @@ public class ReqOrder implements Serializable {
 
     public void setDstAddr(String dstAddr) {
         DstAddr = dstAddr;
-    }
-
-    public String getPayMethod() {
-        return PayMethod;
-    }
-
-    public void setPayMethod(String payMethod) {
-        PayMethod = payMethod;
     }
 
     public int getSize() {
